@@ -1,6 +1,26 @@
 const fs = require('fs');
 const readFile = require('../utils/readFile');
 const writeFile = require('../utils/writeFile');
+const jwt = require('jsonwebtoken');
+
+const login = (req, res) => {
+    const userId = Number(req.query.userId);
+    const result = readFile('data/user.json');
+
+    const checkUser = result.find(item => item.userId === userId);
+
+    if (!checkUser) {
+        return res.status(401).json({message: "Dang nhap ko thanh cong"});
+    }
+
+    const token = jwt.sign({userId: checkUser.userId }, process.env.SECRET_KEY, {
+        expiresIn:"1d"
+    })
+
+    console.log(token);
+
+    return res.status(200).json({message:"Dang nhap thanh cong", token});
+};
 
 const getUser = (req, res) => {
     //const data = fs.readFileSync('user.json');
@@ -50,4 +70,5 @@ module.exports = {
     getUser,
     createUser,
     deleteUser,
+    login
 }
